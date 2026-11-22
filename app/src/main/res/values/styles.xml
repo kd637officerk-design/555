@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TheOne" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#0a0e14</item>
+        <item name="colorPrimaryDark">#05090e</item>
+        <item name="colorAccent">#ff7a1a</item>
+        <item name="android:windowBackground">#05090e</item>
+        <item name="android:statusBarColor">#05090e</item>
+        <item name="android:navigationBarColor">#05090e</item>
+    </style>
+
+    <style name="Theme.TheOne.Fullscreen" parent="Theme.TheOne">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>
