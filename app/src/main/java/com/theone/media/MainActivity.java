@@ -12,9 +12,6 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -22,14 +19,11 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
-import androidx.media.app.NotificationCompat.MediaStyle;
+import androidx.media.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
-
 import androidx.media.MediaMetadataCompat;
 import androidx.media.session.MediaSessionCompat;
 import androidx.media.session.PlaybackStateCompat;
@@ -57,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Fullscreen immersive
         getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN |
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN |
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                WindowManager.LayoutParams.FLAG_FULLSCREEN |
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN |
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         );
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
@@ -110,55 +104,54 @@ public class MainActivity extends AppCompatActivity {
 
     private void injectMediaBridge() {
         String js =
-            "(function(){" +
-            "  if(window.__theOneBridgeInjected) return;" +
-            "  window.__theOneBridgeInjected = true;" +
-            "  window.AndroidMediaBridge = {" +
-            "    play: function(){ var a=document.querySelector('audio,video'); if(a) a.play(); }," +
-            "    pause: function(){ var a=document.querySelector('audio,video'); if(a) a.pause(); }," +
-            "    next: function(){ /* deck may handle */ }," +
-            "    prev: function(){ }," +
-            "    seekTo: function(ms){ var a=document.querySelector('audio,video'); if(a) a.currentTime = ms/1000; }" +
-            "  };" +
-            "  function sync(){" +
-            "    var a = document.querySelector('audio,video');" +
-            "    if(!a || typeof AndroidMedia==='undefined') return;" +
-            "    try {" +
-            "      var title = a.title || document.title || 'THE ONE';" +
-            "      var artist = 'Media Deck';" +
-            "      var dur = (a.duration||0)*1000;" +
-            "      AndroidMedia.updateMetadata(title, artist, dur|0, null);" +
-            "      AndroidMedia.setPlaying(!a.paused, (a.currentTime||0)*1000);" +
-            "    } catch(e){}" +
-            "  }" +
-            "  setInterval(sync, 1200);" +
-            "  document.addEventListener('play', sync, true);" +
-            "  document.addEventListener('pause', sync, true);" +
-            "  document.addEventListener('timeupdate', function(){}, true);" +
-            "})();";
+                "(function(){" +
+                        "  if(window.__theOneBridgeInjected) return;" +
+                        "  window.__theOneBridgeInjected = true;" +
+                        "  window.AndroidMediaBridge = {" +
+                        "    play: function(){ var a=document.querySelector('audio,video'); if(a) a.play(); }," +
+                        "    pause: function(){ var a=document.querySelector('audio,video'); if(a) a.pause(); }," +
+                        "    next: function(){ /* deck may handle */ }," +
+                        "    prev: function(){ }," +
+                        "    seekTo: function(ms){ var a=document.querySelector('audio,video'); if(a) a.currentTime = ms/1000; }" +
+                        "  };" +
+                        "  function sync(){" +
+                        "    var a = document.querySelector('audio,video');" +
+                        "    if(!a || typeof AndroidMedia==='undefined') return;" +
+                        "    try {" +
+                        "      var title = a.title || document.title || 'THE ONE';" +
+                        "      var artist = 'Media Deck';" +
+                        "      var dur = (a.duration||0)*1000;" +
+                        "      AndroidMedia.updateMetadata(title, artist, dur|0, null);" +
+                        "      AndroidMedia.setPlaying(!a.paused, (a.currentTime||0)*1000);" +
+                        "    } catch(e){}" +
+                        "  }" +
+                        "  setInterval(sync, 1200);" +
+                        "  document.addEventListener('play', sync, true);" +
+                        "  document.addEventListener('pause', sync, true);" +
+                        "})();";
         webView.evaluateJavascript(js, null);
     }
 
     private void setupMediaSession() {
         mediaSession = new MediaSessionCompat(this, "TheOneMediaSession");
         mediaSession.setFlags(
-            MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-            MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
         );
 
         stateBuilder = new PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_PLAY |
-                PlaybackStateCompat.ACTION_PAUSE |
-                PlaybackStateCompat.ACTION_PLAY_PAUSE |
-                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                PlaybackStateCompat.ACTION_STOP |
-                PlaybackStateCompat.ACTION_SEEK_TO
-            );
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_STOP |
+                                PlaybackStateCompat.ACTION_SEEK_TO
+                );
 
         mediaSession.setPlaybackState(stateBuilder.setState(
-            PlaybackStateCompat.STATE_PAUSED, 0, 1.0f
+                PlaybackStateCompat.STATE_PAUSED, 0, 1.0f
         ).build());
 
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
@@ -167,9 +160,8 @@ public class MainActivity extends AppCompatActivity {
                 isPlaying = true;
                 requestAudioFocus();
                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
-                // Tell webview
                 runOnUiThread(() -> webView.evaluateJavascript(
-                    "if(window.AndroidMediaBridge){window.AndroidMediaBridge.play();}", null));
+                        "if(window.AndroidMediaBridge){window.AndroidMediaBridge.play();}", null));
                 showNotification();
             }
 
@@ -178,20 +170,20 @@ public class MainActivity extends AppCompatActivity {
                 isPlaying = false;
                 updatePlaybackState(PlaybackStateCompat.STATE_PAUSED);
                 runOnUiThread(() -> webView.evaluateJavascript(
-                    "if(window.AndroidMediaBridge){window.AndroidMediaBridge.pause();}", null));
+                        "if(window.AndroidMediaBridge){window.AndroidMediaBridge.pause();}", null));
                 showNotification();
             }
 
             @Override
             public void onSkipToNext() {
                 runOnUiThread(() -> webView.evaluateJavascript(
-                    "if(window.AndroidMediaBridge){window.AndroidMediaBridge.next();}", null));
+                        "if(window.AndroidMediaBridge){window.AndroidMediaBridge.next();}", null));
             }
 
             @Override
             public void onSkipToPrevious() {
                 runOnUiThread(() -> webView.evaluateJavascript(
-                    "if(window.AndroidMediaBridge){window.AndroidMediaBridge.prev();}", null));
+                        "if(window.AndroidMediaBridge){window.AndroidMediaBridge.prev();}", null));
             }
 
             @Override
@@ -206,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSeekTo(long pos) {
                 currentPosition = pos;
                 runOnUiThread(() -> webView.evaluateJavascript(
-                    "if(window.AndroidMediaBridge){window.AndroidMediaBridge.seekTo(" + pos + ");}", null));
+                        "if(window.AndroidMediaBridge){window.AndroidMediaBridge.seekTo(" + pos + ");}", null));
                 updatePlaybackState(isPlaying ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED);
             }
         });
@@ -221,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateMetadata() {
         MediaMetadataCompat.Builder meta = new MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTitle)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtist)
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTitle)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtist)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
         if (currentArt != null) {
             meta.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, currentArt);
         }
@@ -233,17 +225,15 @@ public class MainActivity extends AppCompatActivity {
     private void requestAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AudioAttributes attrs = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build();
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
             focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(attrs)
-                .setOnAudioFocusChangeListener(focusChange -> {
-                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                        // pause
-                    }
-                })
-                .build();
+                    .setAudioAttributes(attrs)
+                    .setOnAudioFocusChangeListener(focusChange -> {
+                        // handle focus loss if needed
+                    })
+                    .build();
             audioManager.requestAudioFocus(focusRequest);
         } else {
             audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -261,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "THE ONE Media Controls", NotificationManager.IMPORTANCE_LOW);
+                    CHANNEL_ID, "THE ONE Media Controls", NotificationManager.IMPORTANCE_LOW);
             channel.setDescription("System media controls for THE ONE");
             channel.setShowBadge(false);
             NotificationManager nm = getSystemService(NotificationManager.class);
@@ -272,24 +262,24 @@ public class MainActivity extends AppCompatActivity {
     private void showNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(currentTitle)
-            .setContentText(currentArtist)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pi)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setOnlyAlertOnce(true)
-            .setStyle(new MediaStyle()
-                .setMediaSession(mediaSession.getSessionToken())
-                .setShowActionsInCompactView(0, 1, 2))
-            .addAction(android.R.drawable.ic_media_previous, "Prev",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
-            .addAction(isPlaying ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play, "Play/Pause",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_PLAY_PAUSE))
-            .addAction(android.R.drawable.ic_media_next, "Next",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT));
+                .setContentTitle(currentTitle)
+                .setContentText(currentArtist)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pi)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setOnlyAlertOnce(true)
+                .setStyle(new NotificationCompat.MediaStyle()
+                        .setMediaSession(mediaSession.getSessionToken())
+                        .setShowActionsInCompactView(0, 1, 2))
+                .addAction(android.R.drawable.ic_media_previous, "Prev",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
+                .addAction(isPlaying ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play, "Play/Pause",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_PLAY_PAUSE))
+                .addAction(android.R.drawable.ic_media_next, "Next",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT));
 
         if (currentArt != null) {
             builder.setLargeIcon(currentArt);
@@ -358,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()) {
+        if (webView != null && webView.canGoBack()) {
             webView.goBack();
         } else {
             super.onBackPressed();
